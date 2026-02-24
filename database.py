@@ -477,8 +477,12 @@ def init_db():
 def add_store(name, code, address="", phone="", is_hq=0, parent_id=None):
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("INSERT INTO stores (name, code, address, phone, is_hq, parent_id) VALUES (?, ?, ?, ?, ?, ?)",
-        (name, code, address, phone, is_hq, parent_id))
+    try:
+        cursor.execute("INSERT INTO stores (name, code, address, phone, is_hq, parent_id) VALUES (?, ?, ?, ?, ?, ?)",
+            (name, code, address, phone, is_hq, parent_id))
+    except:
+        cursor.execute("INSERT INTO stores (name, code, address, phone) VALUES (?, ?, ?, ?)",
+            (name, code, address, phone))
     conn.commit()
     conn.close()
 
