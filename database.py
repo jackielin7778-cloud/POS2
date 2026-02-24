@@ -1613,6 +1613,7 @@ def get_einvoice(invoice_number):
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM einvoice_main WHERE invoice_number = ?", (invoice_number,))
     invoice = cursor.fetchone()
+    invoice = dict(invoice) if invoice else None
     conn.close()
     return invoice
 
@@ -1622,7 +1623,8 @@ def get_einvoice_details(invoice_id):
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM einvoice_details WHERE invoice_id = ? ORDER BY sequence_number", (invoice_id,))
-    details = cursor.fetchall()
+    rows = cursor.fetchall()
+    details = [dict(row) for row in rows] if rows else []
     conn.close()
     return details
 
@@ -1633,6 +1635,7 @@ def get_einvoice_amount(invoice_id):
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM einvoice_amount WHERE invoice_id = ?", (invoice_id,))
     amount = cursor.fetchone()
+    amount = dict(amount) if amount else None
     conn.close()
     return amount
 
@@ -1643,6 +1646,7 @@ def get_einvoice(invoice_number):
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM einvoice_main WHERE invoice_number = ?", (invoice_number,))
     invoice = cursor.fetchone()
+    invoice = dict(invoice) if invoice else None
     conn.close()
     return invoice
 
