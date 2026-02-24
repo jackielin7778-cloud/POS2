@@ -526,6 +526,7 @@ def get_store_by_id(store_id):
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM stores WHERE id = ?", (store_id,))
     store = cursor.fetchone()
+    store = dict(store) if store else None
     conn.close()
     return store
 
@@ -590,7 +591,8 @@ def get_products(search="", store_id=None):
         cursor.execute("SELECT * FROM products WHERE is_active = 1 AND (name LIKE ? OR barcode LIKE ?)", 
             (f"%{search}%", f"%{search}%"))
     
-    products = cursor.fetchall()
+    rows = cursor.fetchall()
+    products = [dict(row) for row in rows] if rows else []
     conn.close()
     return products
 
@@ -600,6 +602,7 @@ def get_product_by_id(product_id):
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM products WHERE id = ?", (product_id,))
     product = cursor.fetchone()
+    product = dict(product) if product else None
     conn.close()
     return product
 
@@ -659,7 +662,8 @@ def get_members(search="", store_id=None):
     else:
         cursor.execute("SELECT * FROM members WHERE is_active = 1 ORDER BY created_at DESC")
     
-    members = cursor.fetchall()
+    rows = cursor.fetchall()
+    members = [dict(row) for row in rows] if rows else []
     conn.close()
     return members
 
@@ -669,6 +673,7 @@ def get_member_by_phone(phone):
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM members WHERE phone = ? AND is_active = 1", (phone,))
     member = cursor.fetchone()
+    member = dict(member) if member else None
     conn.close()
     return member
 
@@ -678,6 +683,7 @@ def get_member_by_id(member_id):
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM members WHERE id = ?", (member_id,))
     member = cursor.fetchone()
+    member = dict(member) if member else None
     conn.close()
     return member
 
@@ -781,7 +787,8 @@ def get_promotions(product_id=None, active_only=True):
         else:
             cursor.execute("SELECT * FROM promotions ORDER BY created_at DESC")
     
-    promos = cursor.fetchall()
+    rows = cursor.fetchall()
+    promos = [dict(row) for row in rows] if rows else []
     conn.close()
     return promos
 
