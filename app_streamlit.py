@@ -14,7 +14,8 @@ from database import (
     get_members, create_member, add_points, use_points,
     get_promotions, create_promotion,
     get_inventory, transfer_inventory,
-    get_all_tracks, add_track_number
+    get_all_tracks, add_track_number,
+    get_all_einvoices
 )
 
 # 頁面設定
@@ -209,7 +210,7 @@ elif page == "銷售 POS":
 elif page == "電子發票":
     st.title("🧾 電子發票管理")
     
-    tab1, tab2, tab3, tab4 = st.tabs(["發票查詢", "發票開立", "發票統計", "字軌管理"])
+    tab1, tab2, tab3, tab4 = st.tabs(["發票查詢", "已開發票", "發票統計", "字軌管理"])
     
     with tab1:
         invoice_num = st.text_input("發票號碼")
@@ -239,7 +240,34 @@ elif page == "電子發票":
                 st.error("找不到發票")
     
     with tab2:
-        st.info("請至「銷售 POS」開立發票")
+        st.subheader("📋 已開發票列表")
+        einvoices = get_all_einvoices()
+        
+        if einvoices:
+            for inv in einvoices:
+                amount = get_einvoice_amount(inv['id'])
+                total = amount['total_amount'] if amount else 0
+                with st.expander(f"{inv['invoice_number']} - NT${total}"):
+                    st.write(f"**日期:** {inv['invoice_date']}")
+                    st.write(f"**時間:** {inv['invoice_time']}")
+                    st.write(f"**賣方:** {inv['seller_name']}")
+                    st.write(f"**買方:** {inv.get('buyer_name', 'N/A')}")
+                    st.write(f"**隨機碼:** {inv.get('random_number', 'N/A')}")
+                    
+                    details = get_einvoice_details(inv['id'])
+                    if details:
+                        st.write("### 明細")
+                        for d in details:
+                            st.write(f"- {d['product_name']} x{d['quantity']} = NT${d['amount']}")
+                    
+                    # 顯示 XML
+                    xml = generate_mig_xml(inv['invoice_number'])
+                    if xml:
+                        with st.expander("MIG XML"):
+                            st.code(xml, language="xml")
+        else:
+            st.info("尚無已開發票")
+        st.caption("請至「銷售 POS」開立新發票")
     
     with tab3:
         st.subheader("發票統計")
