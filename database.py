@@ -456,6 +456,17 @@ def init_db():
         FOREIGN KEY (invoice_id) REFERENCES einvoice_main(id)
     )''')
 
+    # ===== 資料庫遷移 =====
+    try:
+        cursor.execute("SELECT is_hq FROM stores LIMIT 1")
+    except:
+        cursor.execute("ALTER TABLE stores ADD COLUMN is_hq INTEGER DEFAULT 0")
+    
+    try:
+        cursor.execute("SELECT parent_id FROM stores LIMIT 1")
+    except:
+        cursor.execute("ALTER TABLE stores ADD COLUMN parent_id INTEGER")
+
     conn.commit()
     conn.close()
     print("資料庫初始化完成 (v2.0)")
