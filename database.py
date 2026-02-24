@@ -27,7 +27,7 @@ def init_db():
         code TEXT UNIQUE,
         address TEXT,
         phone TEXT,
-        is_ HQ INTEGER DEFAULT 0,
+        is_hq INTEGER DEFAULT 0,
         parent_id INTEGER,
         is_active INTEGER DEFAULT 1,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
