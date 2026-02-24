@@ -1680,6 +1680,25 @@ def get_all_einvoices(limit=100):
 
 def get_einvoice_statistics(store_id=None, start_date=None, end_date=None):
     """電子發票統計（MIG 4.1 F0401三表結構）"""
+    conn = get_connection()
+    cursor = conn.cursor()
+    
+    query = '''SELECT 
+        COUNT(*) as total_count,
+        SUM(CASE WHEN m.invoice_status = 'issued' THEN a.total_amount ELSE 0 END) as issued_amount,
+        SUM(CASE WHEN m.invoice_status = 'voided' THEN a.total_amount ELSE 0 END) as voided_amount,
+        SUM(a.sales_amount) as total_sales,
+        SUM(a.tax_amount) as total_tax,
+        SUM(a.free_tax_sales_amount) as total_free,
+        SUM(a.zero_tax_sales_amount) as total_zero
+        FROM einvoice_main m
+        JOIN einvoice_amount a ON m.id = a.invoice_id
+        WHERE 1=1'''
+    params = []
+    
+    if store_id:
+        query += " AND m.seller_identifier = ?"
+        params.append(store_id)
     
     if start_date:
         query += " AND m.invoice_date >= ?"
