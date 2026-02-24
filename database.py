@@ -403,6 +403,31 @@ def init_db():
     except:
         pass
 
+    # 新增預設商品
+    try:
+        cursor.execute("SELECT COUNT(*) FROM products")
+        count = cursor.fetchone()[0]
+        if count == 0:
+            sample_products = [
+                ('美式咖啡', 80, 85, 30, 'A001', '飲料'),
+                ('拿鐵', 90, 95, 35, 'A002', '飲料'),
+                ('卡布奇諾', 90, 95, 35, 'A003', '飲料'),
+                ('摩卡', 100, 105, 40, 'A004', '飲料'),
+                ('焦糖瑪奇朵', 110, 115, 45, 'A005', '飲料'),
+                ('奶茶', 70, 75, 25, 'B001', '飲料'),
+                ('檸檬茶', 75, 80, 28, 'B002', '飲料'),
+                ('柳橙汁', 80, 85, 30, 'B003', '飲料'),
+                ('礦泉水', 20, 20, 5, 'C001', '其他'),
+                ('餅乾', 30, 30, 10, 'D001', '點心'),
+                ('蛋糕', 120, 130, 50, 'D002', '點心'),
+                ('司康', 80, 85, 30, 'D003', '點心'),
+            ]
+            for name, price_ex, price_inc, cost, barcode, category in sample_products:
+                cursor.execute("INSERT INTO products (name, price_ex_tax, price_inc_tax, cost, barcode, category) VALUES (?, ?, ?, ?, ?, ?)",
+                    (name, price_ex, price_inc, cost, barcode, category))
+    except:
+        pass
+
     # ===== 6. 發票上傳紀錄 =====
     cursor.execute('''CREATE TABLE IF NOT EXISTS einvoice_upload_log (
         id INTEGER PRIMARY KEY,
