@@ -391,6 +391,18 @@ def init_db():
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )''')
 
+    # 新增測試用字軌號碼（正式環境需使用政府配發的真實號碼）
+    try:
+        cursor.execute("SELECT COUNT(*) FROM einvoice_track_numbers")
+        count = cursor.fetchone()[0]
+        if count == 0:
+            cursor.execute('''INSERT INTO einvoice_track_numbers 
+                (track_code1, track_code2, start_number, end_number, current_number, issue_date)
+                VALUES (?, ?, ?, ?, ?, ?)''',
+                ('AB', '01', 1, 1000, 1, '2026-01-01'))
+    except:
+        pass
+
     # ===== 6. 發票上傳紀錄 =====
     cursor.execute('''CREATE TABLE IF NOT EXISTS einvoice_upload_log (
         id INTEGER PRIMARY KEY,
