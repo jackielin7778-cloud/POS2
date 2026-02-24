@@ -187,7 +187,15 @@ elif page == "銷售 POS":
             
             member = st.selectbox("會員", ["無", "會員A", "會員B"])
             
-            carrier = st.selectbox("載具", ["無", "手機條碼", "自然人憑證"])
+            carrier_type = st.selectbox("載具類型", ["無", "手機條碼", "自然人憑證", "共通性載具"])
+            
+            carrier_id = ""
+            if carrier_type == "共通性載具":
+                carrier_id = st.selectbox("共通性載具", [
+                    "", "悠遊卡", "一卡通", "iCash", "LINE Pay", "街口支付", "其他"
+                ])
+            elif carrier_type in ["手機條碼", "自然人憑證"]:
+                carrier_id = st.text_input(f"{carrier_type}條碼")
             
             submit = st.form_submit_button("開立發票")
             
@@ -197,7 +205,15 @@ elif page == "銷售 POS":
                 items = [{'product_id': c['product_id'], 'name': c['name'], 'quantity': c['quantity'], 
                           'unit_price': c['price'], 'amount': c['price'] * c['quantity']} for c in st.session_state.cart]
                 
-                invoice_id, invoice_number = create_einvoice(store_info, buyer_info, items)
+                # 設定載具
+                c_type = carrier_type if carrier_type != "無" else ""
+                c_id = carrier_id if carrier_id else ""
+                
+                invoice_id, invoice_number = create_einvoice(
+                    store_info, buyer_info, items,
+                    carrier_type=c_type,
+                    carrier_id1=c_id
+                )
                 
                 if invoice_id:
                     st.success(f"發票開立成功!\n發票號碼: {invoice_number}")
