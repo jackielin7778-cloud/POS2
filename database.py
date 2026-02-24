@@ -500,7 +500,8 @@ def get_stores(is_active=None):
             cursor.execute("SELECT * FROM stores WHERE is_active = ? ORDER BY name", (is_active,))
         else:
             cursor.execute("SELECT * FROM stores ORDER BY name")
-    stores = cursor.fetchall()
+    rows = cursor.fetchall()
+    stores = [dict(row) for row in rows] if rows else []
     conn.close()
     return stores
 
