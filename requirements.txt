@@ -4,8 +4,5 @@
 flask>=2.3.0
 streamlit>=1.28.0
 
-# Database
-sqlite3 (內建)
-
-# 其他
+# 圖片處理
 Pillow>=10.0.0
