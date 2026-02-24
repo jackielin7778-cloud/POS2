@@ -13,7 +13,8 @@ from database import (
     create_einvoice, generate_mig_xml, get_einvoice, get_einvoice_details, get_einvoice_amount,
     get_members, create_member, add_points, use_points,
     get_promotions, create_promotion,
-    get_inventory, transfer_inventory
+    get_inventory, transfer_inventory,
+    get_all_tracks, add_track_number
 )
 
 # 頁面設定
@@ -208,7 +209,7 @@ elif page == "銷售 POS":
 elif page == "電子發票":
     st.title("🧾 電子發票管理")
     
-    tab1, tab2, tab3 = st.tabs(["發票查詢", "發票開立", "發票統計"])
+    tab1, tab2, tab3, tab4 = st.tabs(["發票查詢", "發票開立", "發票統計", "字軌管理"])
     
     with tab1:
         invoice_num = st.text_input("發票號碼")
@@ -248,6 +249,38 @@ elif page == "電子發票":
         col1.metric("總發票數", stats['total_count'])
         col2.metric("已開立金額", f"NT${stats['issued_amount']}")
         col3.metric("作廢金額", f"NT${stats['voided_amount']}")
+    
+    with tab4:
+        st.subheader("📋 字軌管理")
+        
+        # 顯示現有字軌
+        tracks = get_all_tracks()
+        if tracks:
+            st.write("### 現有字軌")
+            for t in tracks:
+                with st.expander(f"{t['track_code1']}{t['track_code2']} - {t['current_number']}/{t['end_number']}"):
+                    st.write(f"起始號碼: {t['start_number']}")
+                    st.write(f"結束號碼: {t['end_number']}")
+                    st.write(f"目前號碼: {t['current_number']}")
+                    st.write(f"發放日期: {t.get('issue_date', 'N/A')}")
+                    st.write(f"狀態: {'啟用' if t.get('is_active') else '停用'}")
+        else:
+            st.warning("尚無字軌資料")
+        
+        # 新增字軌表單
+        st.write("### 新增字軌")
+        with st.form("add_track"):
+            col1, col2 = st.columns(2)
+            track_code1 = col1.text_input("字軌代號1", value="AB")
+            track_code2 = col2.text_input("字軌代號2", value="01")
+            start_num = st.number_input("起始號碼", min_value=1, value=1)
+            end_num = st.number_input("結束號碼", min_value=1, value=1000)
+            issue_date = st.date_input("發放日期")
+            
+            if st.form_submit_button("新增字軌"):
+                add_track_number(track_code1, track_code2, start_num, end_num, str(issue_date))
+                st.success("字軌新增成功！請重新整理頁面")
+                st.rerun()
 
 # ===== 會員管理 =====
 elif page == "會員管理":

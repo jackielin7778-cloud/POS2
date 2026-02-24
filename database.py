@@ -1431,8 +1431,20 @@ def get_available_track():
         WHERE is_active = 1 AND current_number <= end_number
         ORDER BY issue_date LIMIT 1''')
     track = cursor.fetchone()
+    track = dict(track) if track else None
     conn.close()
     return track
+
+
+def get_all_tracks():
+    """取得所有字軌"""
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM einvoice_track_numbers ORDER BY id DESC")
+    rows = cursor.fetchall()
+    tracks = [dict(row) for row in rows] if rows else []
+    conn.close()
+    return tracks
 
 
 def consume_track_number():
