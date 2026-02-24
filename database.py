@@ -486,10 +486,16 @@ def add_store(name, code, address="", phone="", is_hq=0, parent_id=None):
 def get_stores(is_active=None):
     conn = get_connection()
     cursor = conn.cursor()
-    if is_active is not None:
-        cursor.execute("SELECT * FROM stores WHERE is_active = ? ORDER BY is_hq DESC, name", (is_active,))
-    else:
-        cursor.execute("SELECT * FROM stores ORDER BY is_hq DESC, name")
+    try:
+        if is_active is not None:
+            cursor.execute("SELECT * FROM stores WHERE is_active = ? ORDER BY is_hq DESC, name", (is_active,))
+        else:
+            cursor.execute("SELECT * FROM stores ORDER BY is_hq DESC, name")
+    except:
+        if is_active is not None:
+            cursor.execute("SELECT * FROM stores WHERE is_active = ? ORDER BY name", (is_active,))
+        else:
+            cursor.execute("SELECT * FROM stores ORDER BY name")
     stores = cursor.fetchall()
     conn.close()
     return stores
