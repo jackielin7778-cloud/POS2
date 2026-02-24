@@ -8,8 +8,8 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from database import (
     init_db, get_connection,
-    get_stores, create_store, get_store,
-    get_products, create_product, get_product,
+    get_stores, create_store, get_store_by_id,
+    get_products, create_product, get_product_by_id,
     create_einvoice, generate_mig_xml, get_einvoice, get_einvoice_details, get_einvoice_amount,
     get_members, create_member, add_points, use_points,
     get_promotions, create_promotion,
