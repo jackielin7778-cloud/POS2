@@ -457,15 +457,22 @@ def init_db():
     )''')
 
     # ===== 資料庫遷移 =====
-    try:
-        cursor.execute("SELECT is_hq FROM stores LIMIT 1")
-    except:
-        cursor.execute("ALTER TABLE stores ADD COLUMN is_hq INTEGER DEFAULT 0")
+    # 檢查並新增可能缺少的欄位
+    columns_to_add = [
+        ("is_hq", "INTEGER DEFAULT 0"),
+        ("parent_id", "INTEGER"),
+        ("is_active", "INTEGER DEFAULT 1"),
+        ("created_at", "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"),
+    ]
     
-    try:
-        cursor.execute("SELECT parent_id FROM stores LIMIT 1")
-    except:
-        cursor.execute("ALTER TABLE stores ADD COLUMN parent_id INTEGER")
+    for col, col_type in columns_to_add:
+        try:
+            cursor.execute(f"SELECT {col} FROM stores LIMIT 1")
+        except:
+            try:
+                cursor.execute(f"ALTER TABLE stores ADD COLUMN {col} {col_type}")
+            except:
+                pass
 
     conn.commit()
     conn.close()
@@ -481,8 +488,16 @@ def add_store(name, code, address="", phone="", is_hq=0, parent_id=None):
         cursor.execute("INSERT INTO stores (name, code, address, phone, is_hq, parent_id) VALUES (?, ?, ?, ?, ?, ?)",
             (name, code, address, phone, is_hq, parent_id))
     except:
-        cursor.execute("INSERT INTO stores (name, code, address, phone) VALUES (?, ?, ?, ?)",
-            (name, code, address, phone))
+        try:
+            cursor.execute("INSERT INTO stores (name, code, address, phone, is_hq) VALUES (?, ?, ?, ?, ?)",
+                (name, code, address, phone, is_hq))
+        except:
+            try:
+                cursor.execute("INSERT INTO stores (name, code, address, phone) VALUES (?, ?, ?, ?)",
+                    (name, code, address, phone))
+            except:
+                cursor.execute("INSERT INTO stores (name, address, phone) VALUES (?, ?, ?)",
+                    (name, address, phone))
     conn.commit()
     conn.close()
 
