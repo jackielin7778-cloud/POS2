@@ -283,8 +283,8 @@ elif page == "促銷管理":
     
     with tab1:
         promos = get_promotions()
-        for:
-            with st.expander(f"{p['name'] p in promos}"):
+        for p in promos:
+            with st.expander(f"{p['name']}"):
                 st.write(f"**折扣:** {p.get('discount_type', '')} {p.get('discount_value', 0)}")
                 st.write(f"**期間:** {p.get('start_date', '')} ~ {p.get('end_date', '')}")
     
